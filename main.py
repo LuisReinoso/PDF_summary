@@ -2,7 +2,6 @@
 
 from __future__ import absolute_import
 from __future__ import division, print_function, unicode_literals
-from sumy.parsers.html import HtmlParser
 from sumy.parsers.plaintext import PlaintextParser
 from sumy.nlp.tokenizers import Tokenizer
 from sumy.summarizers.lsa import LsaSummarizer as Lsa
@@ -26,7 +25,6 @@ import time
 import shutil
 import sys, traceback
 import xlrd
-
 
 # Helper class used to map pages numbers to bookmarks
 class BookmarkToPageMap(PyPDF2.PdfFileReader):
@@ -65,7 +63,7 @@ class BookmarkToPageMap(PyPDF2.PdfFileReader):
             result[title] = page_id_to_page_numbers.get(page_idnum, '???')
         return result
 
-#Functon to convert pdf into text 
+#Functon to convert pdf into text
 def convert(fname, pages=None):
     if not pages:
         pagenums = set()
@@ -101,12 +99,12 @@ def option(x):
 ##########################  Main Program   ########################
 
 #Set parameters
-LANGUAGE = "English"
+LANGUAGE = "spanish"
 SENTENCES_COUNT = 30
 sourcePDFFile = raw_input("Enter Soruce file with path \n")
 if os.path.exists(sourcePDFFile):
     print('Found source PDF file')
-    
+
 PDF_SummaryDir= raw_input("Enter Output Directory path \n")
 chooseAlgo = option(raw_input("Select Algorithm \n press 1 and enter for Luhn. \n press 2 and enter for Lsa. \n press 3 and enter for LexRank. \n press 4 and enter for TextRank. \n press 5 and enter for SumBasic.\n press 6 and enter for KLsum.\n press 0 and enter to exit. \n"))
 
@@ -116,43 +114,43 @@ if not os.path.exists(PDF_SummaryDir):
     os.makedirs(PDF_SummaryDir)
 
 #create directories for output files
-outputPDFDir =  os.path.dirname(PDF_SummaryDir + '\pdf\pdf_split_files\\')
+outputPDFDir =  os.path.dirname(PDF_SummaryDir + '/pdf/pdf_split_files/')
 if not os.path.exists(outputPDFDir):
-    os.makedirs(PDF_SummaryDir + '\pdf\pdf_split_files\\')
+    os.makedirs(PDF_SummaryDir + '/pdf/pdf_split_files/')
 
-    
-outputTXTDir = os.path.dirname(PDF_SummaryDir + '\Text_Files\\')
+
+outputTXTDir = os.path.dirname(PDF_SummaryDir + '/Text_Files/')
 if not os.path.exists(outputTXTDir):
-    os.makedirs(PDF_SummaryDir + '\Text_Files\\')
-            
-outputSummaryDir = os.path.dirname(PDF_SummaryDir + '\Summary\\')
+    os.makedirs(PDF_SummaryDir + '/Text_Files/')
+
+outputSummaryDir = os.path.dirname(PDF_SummaryDir + '/Summary/')
 if not os.path.exists(outputSummaryDir):
-    os.makedirs(PDF_SummaryDir + '\Summary\\')
+    os.makedirs(PDF_SummaryDir + '/Summary/')
 
 #Name prefix for split files
 outputNamePrefix = 'Split_Chapter_'
 timeSuffixSummary = str(time.strftime("%d-%m-%Y_%H.%M.%S"))
 targetPDFFile = 'temppdfsplitfile.pdf' # Temporary file
 
-   
+
 # Append backslash to output dir ofor pdf if necessary
-if not outputPDFDir.endswith('\\'):
-    outputPDFDir = outputPDFDir + '\\'
+if not outputPDFDir.endswith('/'):
+    outputPDFDir = outputPDFDir + '/'
 
 # Append backslash to output dir for txt if necessary
-if not outputTXTDir.endswith('\\'):
-    outputTXTDir = outputTXTDir + '\\'
+if not outputTXTDir.endswith('/'):
+    outputTXTDir = outputTXTDir + '/'
 
 # Append backslash to output dir ofor pdf if necessary
-if not outputSummaryDir.endswith('\\'):
-    outputSummaryDir = outputSummaryDir + '\\'
+if not outputSummaryDir.endswith('/'):
+    outputSummaryDir = outputSummaryDir + '/'
 
 #Check and Verify if PDF is ready for splitting
 while not os.path.exists(sourcePDFFile):
     print('Source PDF not found, sleeping...')
     #Sleep
     time.sleep(10)
-    
+
 if os.path.exists(sourcePDFFile):
     #print('Found source PDF file')
     #Copy file to local working directory
@@ -178,7 +176,7 @@ if os.path.exists(sourcePDFFile):
     #   To Check Page number and Title of the Chapter Uncomment the following lines
     ##  print (template % ('Page', 'Title'))
     ##  print (template % (p+1,t))
-        
+
         newPageNum = p + 1
         newPageName = t
 
@@ -189,22 +187,22 @@ if os.path.exists(sourcePDFFile):
         else:
            # Next Page
             pdfWriter = PyPDF2.PdfFileWriter()
-            page_idx = 0 
+            page_idx = 0
             for i in range(prevPageNum, newPageNum):
                 pdfPage = pdfReader.getPage(i-1)
                 pdfWriter.insertPage(pdfPage, page_idx)
         #   Check : print('Added page to PDF file: ' + prevPageName + ' - Page #: ' + str(i))
                 page_idx+=1
 
-        #   Creating names of split files      
-            pdfFileName = outputNamePrefix + str(str(prevPageName).replace(':','_')).replace('*','_') + '.pdf'
-            txtFileName = outputNamePrefix + str(str(prevPageName).replace(':','_')).replace('*','_') + '.txt'
+        #   Creating names of split files
+            pdfFileName = unicode( outputNamePrefix + (prevPageName).encode('ascii', 'ignore') + '.pdf' ).encode('utf8').replace(':','_').replace('*','_')
+            txtFileName = unicode( outputNamePrefix + (prevPageName).encode('ascii', 'ignore') + '.txt' ).encode('utf8').replace(':','_').replace('*','_')
 
-        #   Writing each chapter to the .pdf file 
-            pdfOutputFile = open(outputPDFDir + pdfFileName, 'wb') 
+        #   Writing each chapter to the .pdf file
+            pdfOutputFile = open(outputPDFDir + pdfFileName, 'wb')
             pdfWriter.write(pdfOutputFile)
             pdfOutputFile.close()
-            
+
         #   Check : print('Created PDF file: ' + outputPDFDir + pdfFileName)
 
         #   Calling convert function and writing each chapter to the .txt file
@@ -212,12 +210,12 @@ if os.path.exists(sourcePDFFile):
             txtOutputFile.write(convert(outputPDFDir + pdfFileName))
             txtOutputFile.close()
         #   Check :print('Created TXT file: ' + outputTXTDir + txtFileName)
-        
-        #   for plain text files create Summary 
+
+        #   for plain text files create Summary
             parser = PlaintextParser.from_file(outputTXTDir + txtFileName, Tokenizer(LANGUAGE))
             stemmer = Stemmer(LANGUAGE)
         #   Using LsaSummarizer to create summary
-        ##  Select from different algorithms to create summary by using different algorithms 
+        ##  Select from different algorithms to create summary by using different algorithms
             if chooseAlgo == 'Lsa' :
                 summarizer = Lsa(stemmer)
             elif chooseAlgo == 'LexRank':
@@ -233,26 +231,26 @@ if os.path.exists(sourcePDFFile):
             else :
                 print ( 'Wrong Algorithm selected.')
                 sys.exit(0)
-            
+
             summarizer.stop_words = get_stop_words(LANGUAGE)
-        #   Open file in append mode so that summary will be added at the bottom of file 
+        #   Open file in append mode so that summary will be added at the bottom of file
             summaryOutputFile = open(outputSummaryDir + chooseAlgo + '_Summary_File' + timeSuffixSummary + '.txt','a')
             for sentence in summarizer(parser.document, SENTENCES_COUNT):
         #   Check : print (sentence)
-                summaryOutputFile.write(str(sentence))
+                summaryOutputFile.write(unicode(sentence).encode('utf8'))
 
         #   To create Separation between Chapters
-            summaryOutputFile.write('\n\n'+ 'Title : '+str(t)+'\n'+'\t')
-            summaryOutputFile.close()           
+            summaryOutputFile.write(unicode('\n\n'+ 'Title : '+t+'\n'+'\t').encode('utf8'))
+            summaryOutputFile.close()
         #   Check : print('Created TXT file: ' + outputSummaryDir + 'SummaryFile.txt')
-                     
+
         i = prevPageNum
         prevPageNum = newPageNum
         prevPageName = newPageName
 
     # Split the last page
     pdfWriter = PyPDF2.PdfFileWriter()
-    page_idx = 0 
+    page_idx = 0
     for i in range(prevPageNum, numberOfPages + 1):
         pdfPage = pdfReader.getPage(i-1)
         pdfWriter.insertPage(pdfPage, page_idx)
@@ -263,8 +261,3 @@ if os.path.exists(sourcePDFFile):
 
 # Delete temp file
 os.unlink(targetPDFFile)
-
-
-
-    
-
