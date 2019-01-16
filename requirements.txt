@@ -2,3 +2,4 @@ pdfminer.six==20181108
 xlrd==1.1.0
 sumy==0.7.0
 PyPDF2==1.26.0
+cutie==0.2.2
