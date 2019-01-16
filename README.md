@@ -2,7 +2,7 @@
 > Obtén el resumen de un pdf en una sola página.
 
 ## Dependencias
-- pdfminer
+- pdfminer.six
 - sumy
 - PyPDF2
 - NLTK tokenizers punkt
@@ -15,13 +15,13 @@
 	```
 - instalar dependencias
 	``` bash
-	pip install -r ./requirements.txt
+	pip3 install -r ./requirements.txt
 	```
 
 ## Uso
 - ejecutar main.py
 	``` bash
-	python main.py
+	python3 main.py
 	```
 - insertar la ruta del pdf a resumir
 	``` bash

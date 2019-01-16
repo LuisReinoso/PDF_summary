@@ -12,7 +12,7 @@ from sumy.summarizers.sum_basic import SumBasicSummarizer as SumBasic
 from sumy.summarizers.kl import KLSummarizer as KLsum
 from sumy.nlp.stemmers import Stemmer
 from sumy.utils import get_stop_words
-from cStringIO import StringIO
+from io import StringIO
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
@@ -72,10 +72,10 @@ def convert(fname, pages=None):
   #  Check :  print ('converting......')
     output = StringIO()
     manager = PDFResourceManager()
-    converter = TextConverter(manager, output, laparams=LAParams())
+    converter = TextConverter(manager, output, laparams=LAParams(), codec='utf-8')
     interpreter = PDFPageInterpreter(manager, converter)
 
-    infile = file(fname, 'rb')
+    infile = open(fname, 'rb')
     for page in PDFPage.get_pages(infile, pagenums):
         interpreter.process_page(page)
     infile.close()
@@ -101,12 +101,12 @@ def option(x):
 #Set parameters
 LANGUAGE = "spanish"
 SENTENCES_COUNT = 30
-sourcePDFFile = raw_input("Enter Soruce file with path \n")
+sourcePDFFile = input("Enter Soruce file with path \n")
 if os.path.exists(sourcePDFFile):
     print('Found source PDF file')
 
-PDF_SummaryDir= raw_input("Enter Output Directory path \n")
-chooseAlgo = option(raw_input("Select Algorithm \n press 1 and enter for Luhn. \n press 2 and enter for Lsa. \n press 3 and enter for LexRank. \n press 4 and enter for TextRank. \n press 5 and enter for SumBasic.\n press 6 and enter for KLsum.\n press 0 and enter to exit. \n"))
+PDF_SummaryDir= input("Enter Output Directory path \n")
+chooseAlgo = option(input("Select Algorithm \n press 1 and enter for Luhn. \n press 2 and enter for Lsa. \n press 3 and enter for LexRank. \n press 4 and enter for TextRank. \n press 5 and enter for SumBasic.\n press 6 and enter for KLsum.\n press 0 and enter to exit. \n"))
 
 
 #Check if the directory PDF_summary exists or not
@@ -195,8 +195,8 @@ if os.path.exists(sourcePDFFile):
                 page_idx+=1
 
         #   Creating names of split files
-            pdfFileName = unicode( outputNamePrefix + (prevPageName).encode('ascii', 'ignore') + '.pdf' ).encode('utf8').replace(':','_').replace('*','_')
-            txtFileName = unicode( outputNamePrefix + (prevPageName).encode('ascii', 'ignore') + '.txt' ).encode('utf8').replace(':','_').replace('*','_')
+            pdfFileName = str( outputNamePrefix + prevPageName + '.pdf' ).replace(':','_').replace('*','_')
+            txtFileName = str( outputNamePrefix + prevPageName + '.txt' ).replace(':','_').replace('*','_')
 
         #   Writing each chapter to the .pdf file
             pdfOutputFile = open(outputPDFDir + pdfFileName, 'wb')
@@ -237,10 +237,10 @@ if os.path.exists(sourcePDFFile):
             summaryOutputFile = open(outputSummaryDir + chooseAlgo + '_Summary_File' + timeSuffixSummary + '.txt','a')
             for sentence in summarizer(parser.document, SENTENCES_COUNT):
         #   Check : print (sentence)
-                summaryOutputFile.write(unicode(sentence).encode('utf8'))
+                summaryOutputFile.write(str(sentence))
 
         #   To create Separation between Chapters
-            summaryOutputFile.write(unicode('\n\n'+ 'Title : '+t+'\n'+'\t').encode('utf8'))
+            summaryOutputFile.write(str('\n\n'+ 'Title : '+t+'\n'+'\t'))
             summaryOutputFile.close()
         #   Check : print('Created TXT file: ' + outputSummaryDir + 'SummaryFile.txt')
 
